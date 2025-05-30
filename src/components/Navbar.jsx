@@ -3,15 +3,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaBars, FaTimes, FaChevronDown, FaSearch } from "react-icons/fa";
+import { FaBars, FaTimes, FaSearch } from "react-icons/fa";
+import DropdownMenu from "@/components/dropdown"; // Adjust path as needed
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDropDown, setIsDropDown] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const dropdownRef = useRef(null);
 
   const fakeSuggestions = [
     "God’s grace",
@@ -22,16 +21,7 @@ function Navbar() {
   ];
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropDown(false);
-      }
-    };
-
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
         setShowSearch(false);
@@ -39,24 +29,18 @@ function Navbar() {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleSearch = () => {
     setShowSearch(!showSearch);
-    setIsDropDown(false);
     setIsMenuOpen(false);
   };
 
@@ -68,9 +52,9 @@ function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 bg-blush transition-all duration-300 ease-in-out ${
+      className={`fixed top-0 left-0 w-full z-50 bg-blush transition-all duration-300 ease-in-out  ${
         isScrolled ? "h-14 shadow-md" : "h-20"
-      }`}
+      } overflow-visible`}
     >
       {/* Search Overlay */}
       <div
@@ -91,7 +75,6 @@ function Navbar() {
               <FaTimes className="h-6 w-6" />
             </button>
 
-            {/* Search Suggestions */}
             {filteredSuggestions.length > 0 && (
               <ul className="absolute top-full left-0 w-full bg-copper/90 backdrop-blur-md mt-2 rounded shadow-lg p-2 z-50">
                 {filteredSuggestions.map((suggestion, idx) => (
@@ -121,7 +104,6 @@ function Navbar() {
           height={isScrolled ? 100 : 130}
           className="transition-all duration-300 ease-in-out"
         />
-
         <div className="flex items-center space-x-4">
           <button onClick={toggleSearch} className="btn btn-ghost">
             <FaSearch className="h-6 w-6 text-black" />
@@ -132,7 +114,7 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Sidebar for mobile */}
+      {/* Mobile Sidebar */}
       <div
         className={`fixed top-0 left-0 w-full h-screen bg-copper text-black transition-transform duration-300 ease-in-out z-30 ${
           isMenuOpen ? "translate-y-0" : "-translate-y-full"
@@ -143,7 +125,6 @@ function Navbar() {
             <FaTimes className="h-8 w-8" />
           </button>
         </div>
-
         <ul className="space-y-4 p-6 text-lg font-Poppins">
           <li>
             <a href="#">Home</a>
@@ -152,29 +133,25 @@ function Navbar() {
             <a href="#">Daily Devotional</a>
           </li>
           <li>
-            <a href="#">About Me</a>
+            <DropdownMenu
+              label="About"
+              isMobile={true}
+              items={[
+                { label: "About me", href: "/about-me" },
+                { label: "About the blog", href: "/About-us" },
+              ]}
+            />
           </li>
-          <li ref={dropdownRef}>
-            <button
-              onClick={() => setIsDropDown(!isDropDown)}
-              className="flex items-center space-x-2"
-            >
-              <span>Blog Posts</span>
-              <FaChevronDown />
-            </button>
-            {isDropDown && (
-              <ul className="ml-4 mt-2 space-y-2">
-                <li>
-                  <a href="#">Category 1</a>
-                </li>
-                <li>
-                  <a href="#">Category 2</a>
-                </li>
-                <li>
-                  <a href="#">Category 3</a>
-                </li>
-              </ul>
-            )}
+          <li>
+            <DropdownMenu
+              label="Blog Posts"
+              isMobile={true}
+              items={[
+                { label: "Category 1", href: "#" },
+                { label: "Category 2", href: "#" },
+                { label: "Category 3", href: "#" },
+              ]}
+            />
           </li>
           <li>
             <a href="#">Resources</a>
@@ -183,7 +160,7 @@ function Navbar() {
             <a href="#">Subscribe</a>
           </li>
           <li>
-            <a href="#">Contact</a>
+            <a href="/contact">Contact</a>
           </li>
         </ul>
       </div>
@@ -197,7 +174,6 @@ function Navbar() {
           height={isScrolled ? 100 : 130}
           className="transition-all duration-300 ease-in-out"
         />
-
         <div className="flex items-center space-x-6 font-Poppins text-lg">
           {!showSearch && (
             <>
@@ -207,48 +183,28 @@ function Navbar() {
               <Link href="#" className="btn btn-ghost text-black">
                 Daily Devotionals
               </Link>
-              <Link href="#" className="btn btn-ghost text-black">
-                About Me
-              </Link>
-
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsDropDown(!isDropDown);
-                  }}
-                  className="btn btn-ghost text-black flex items-center space-x-1"
-                >
-                  <span>Blog Posts</span>
-                  <FaChevronDown className="h-4 w-4" />
-                </button>
-
-                <div
-                  className={`absolute mt-2 bg-copper shadow-md rounded w-40 p-2 space-y-2 transition-all duration-300 ease-in-out ${
-                    isDropDown
-                      ? "opacity-100 scale-100"
-                      : "opacity-0 scale-95 pointer-events-none"
-                  }`}
-                >
-                  <Link href="#" className="block">
-                    Category 1
-                  </Link>
-                  <Link href="#" className="block">
-                    Category 2
-                  </Link>
-                  <Link href="#" className="block">
-                    Category 3
-                  </Link>
-                </div>
-              </div>
-
+              <DropdownMenu
+                label="About"
+                items={[
+                  { label: "About me", href: "/about-me" },
+                  { label: "About the blog", href: "About-us" },
+                ]}
+              />
+              <DropdownMenu
+                label="Blog Posts"
+                items={[
+                  { label: "Category 1", href: "#" },
+                  { label: "Category 2", href: "#" },
+                  { label: "Category 3", href: "#" },
+                ]}
+              />
               <Link href="#" className="btn btn-ghost text-black">
                 Resources
               </Link>
               <Link href="#" className="btn btn-ghost text-black">
                 Subscribe
               </Link>
-              <Link href="#" className="btn btn-ghost text-black">
+              <Link href="/contact" className="btn btn-ghost text-black">
                 Contact
               </Link>
             </>

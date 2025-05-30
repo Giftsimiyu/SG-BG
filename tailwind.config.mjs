@@ -13,9 +13,9 @@ export default {
         black: "#292421",
         copper: "#A75F37",
         pink: "#CA8E82",
-        tan: "D9B99F",
+        tan: "#D2B48C",
         blush: "#F2D6CE",
-        vanilla: "F2E7DD",
+        vanilla: "#F2E7DD",
         green: "#7A958F",
         mint: "#BAE0DA",
       },
@@ -24,6 +24,15 @@ export default {
         oswald: ["Oswald", "sans-serif"],
         lora: ["Lora", "serif"],
         nunito: ["Nunito", "sans-serif"],
+      },
+      animation: {
+        "fade-in": "fadeIn 0.6s ease-out both",
+      },
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: 0, transform: "translateY(10px)" },
+          "100%": { opacity: 1, transform: "translateY(0)" },
+        },
       },
     },
   },
